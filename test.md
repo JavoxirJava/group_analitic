@@ -1,0 +1,4 @@
+## const YOUR_API_ID = "27394255"
+## const YOUR_API_HASH = "439b82a304af3de333e8004acb53a82d"
+/usr/local/lib/libtdjson.dylib
+# 1AgAOMTQ5LjE1NC4xNjcuNTABuw0k06kIemtvIUXa97O1kB3ATOiAn3fvwk48jh227iAJ0BpC2rjsf8LtBRBwhUy7ZS4PvLu/RNNJqUjwIhdNWeL2S3Ovi0ZsJtgbRddNuxFTT61BPTZq+l0WXSSNSEytlZGtBYg6wKAm6AtnueT0faH89YdKxinw4KvoqN2jrslA7rTLzl8xle7RdkNCtZYI/f3LeJ/kRIoLNeOWVdLx13wcijaynPGdtpKRyyh3FTShvMZuqs+uRXMcvr9wfqCRYhlr+H/I7xeLDZ90F6+RpRPnWOVjoVduB8Ir1N452F6aZlsSROI6j2cTCaTu6WKjRDvpdauvhGlHlNWqbgyV8Ug=
