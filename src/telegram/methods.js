@@ -1,10 +1,13 @@
 import fs from 'fs';
 import readline from 'readline';
+import { groupMap, check } from '../globalVar.js';
+
 
 export const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
 });
+
 export const loadSessions = () => {
     if (!fs.existsSync(sessionsFolder)) fs.mkdirSync(sessionsFolder);
     return fs.readdirSync(sessionsFolder).filter((file) => file.endsWith('.json'));
@@ -32,18 +35,32 @@ export async function selectSession(sessions) {
 
 export function eventMessage(client) {
     client.addEventHandler(async (update) => {
-        const message = update.message;
-        if (!message) return;
-
         try {
-            const sender = await client.getEntity(message.senderId || message.chatId); // Jo'natuvchini aniqlash
-            const senderName = sender.username || sender.firstName || 'Noma’lum';
+            if (update.message?.action && update.message.action.className === 'MessageActionChatAddUser') {
+                const addedUsers = update.message.action.users.map(u => u.value);
+                if (addedUsers.includes(client.session.userId)) {
+                    console.log("Siz yangi guruhga qo‘shildingiz!");
+                }
+            }
 
-            console.log(`\nYangi xabar keldi!`);
-            console.log(`Kimdan: ${senderName}`);
-            console.log(`Xabar: ${message.message}`);
+            if (update.className == "UpdateNewChannelMessage") {
+                const message = update.message; // Xabar matni
+
+                check.forEach((word) => {
+                    if (message.message.toLowerCase().includes(word)) {
+                        console.log(`✅ "${word}" so‘zi topildi!`);
+                    }
+                });
+                console.log("------------------------ UpdateNewChannelMessage ------------------------");
+                console.log(`📩 Yangi xabar keldi!`);
+                console.log(`💬 Xabar: ${message.message}`);
+                console.log(`📢 Kanal: ${message.peerId?.channelId}`);
+                const chat = await client.getEntity(message.peerId?.channelId); // Kanal haqida ma'lumot
+                console.log(`📢 Kanal Nomi: ${chat.title}`)
+                console.log(`📢 Kanal Username: https://t.me/${chat?.username}`);
+            }
         } catch (err) {
-            console.log(`Xabarni o'qishda xatolik yuz berdi: ${err.message}`);
+            console.log(`❌ Xatolik: ${err.message}`);
         }
     });
 }

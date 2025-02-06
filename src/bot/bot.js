@@ -1,5 +1,4 @@
 const { Telegraf } = require('telegraf');
-const { sendMessage } = require('telegram/client/messages');
 
 // username: @full_testbot
 const bot = new Telegraf('7383627105:AAFrktVAWW7g6tIiNwxd8pi8xsGLMPR_8ZQ');
@@ -12,15 +11,16 @@ bot.help((ctx) => {
     ctx.reply('Men yordam bera oladigan komandalar:\n/start - Botni ishga tushirish\n/help - Yordam olish\n/info - Siz haqingizda ma\'lumot');
 });
 
-bot.on('message', (ctx) => {
+bot.on('message', ctx => {
     if (ctx.message.text) {
         console.log(ctx.message.text);
         ctx.reply(`Siz: "${ctx.message.text}" deb yozdingiz.`);
     }
 });
-sendMessage(bot, 123123123, 'test');
 
-bot.command('info', (ctx) => {
+// sendMessage(bot, 123123123, 'test');
+
+bot.command('info', ctx => {
     const user = ctx.from;
     ctx.reply(`Siz haqingizda ma'lumot:\nIsm: ${user.first_name}\nFamiliya: ${user.last_name || 'yoʻq'}\nUsername: @${user.username || 'yoʻq'}`);
 });

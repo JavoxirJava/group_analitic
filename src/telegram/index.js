@@ -1,7 +1,7 @@
-const { TelegramClient } = require('telegram');
-const { StringSession } = require('telegram/sessions');
-const fs = require('fs');
-const { selectSession, askQuestion, rl, loadSessions, eventMessage, createNewSession } = require('./methods');
+import { TelegramClient } from 'telegram';
+import { StringSession } from 'telegram/sessions/index.js';
+import fs from 'fs';
+import { selectSession, askQuestion, rl, loadSessions, eventMessage, createNewSession } from './methods.js';
 
 const apiId = 27394255; // API ID
 const apiHash = '439b82a304af3de333e8004acb53a82d'; // API Hash
@@ -40,7 +40,7 @@ const apiHash = '439b82a304af3de333e8004acb53a82d'; // API Hash
             password: async () => await askQuestion('Parolni kiriting (agar kerak bo‘lsa): '),
             phoneCode: async () => await askQuestion('SMS kodni kiriting: '),
             onError: (err) => console.log('Xatolik:', err),
-        });
+        }); /// ================ function clouser orqali ishlatib kurish /// ====================================
         rl.close();
 
         console.log('\nMuvaffaqiyatli ulandingiz!');
