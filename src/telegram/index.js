@@ -2,11 +2,14 @@ import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions/index.js';
 import fs from 'fs';
 import { selectSession, askQuestion, rl, loadSessions, eventMessage, createNewSession } from './methods.js';
+import { loadGroupsAndUsers } from '../globalVar.js';
 
 const apiId = 27394255; // API ID
 const apiHash = '439b82a304af3de333e8004acb53a82d'; // API Hash
 
 (async () => {
+    await loadGroupsAndUsers(); // groupMap va userMap ni yuklash
+
     console.log('\nSessiya yaratasizmi?\n1 - Ha\n2 - Yo‘q');
     const option = await askQuestion('Tanlovingizni kiriting (1 yoki 2): ');
 

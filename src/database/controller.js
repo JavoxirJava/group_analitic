@@ -6,19 +6,22 @@ export const addUser = async (id, username, fullName) => {
         INSERT INTO users (id, username, full_name)
         VALUES ($1, $2, $3)
         RETURNING id, username, full_name, registration_date;
-        `, [id, username, fullName]).rows[0];
+        `, [id, username, fullName]);
 };
 
 export const getAllUsers = async () => {
-    return await db.query('SELECT * FROM users').rows;
+    const res = await db.query('SELECT * FROM users');
+    return res.rows;
 };
 
 export const getUserById = async (userId) => {
-    return await db.query('SELECT * FROM users WHERE id = $1', [userId]).rows[0];
+    const res = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
+    return res.rows[0];
 };
 
 export const deleteUser = async (userId) => {
-    return await db.query('DELETE FROM users WHERE id = $1 RETURNING id', [userId]).rows[0];
+    const res = await db.query('DELETE FROM users WHERE id = $1 RETURNING id', [userId]);
+    return res.rows[0];
 };
 
 // 2. **Groups CRUD**
@@ -27,26 +30,30 @@ export const addGroup = async (id, groupName, price, description) => {
         INSERT INTO groups (id, group_name, price, description)
         VALUES ($1, $2, $3, $4)
         RETURNING id, group_name, price, description, created_at;
-    `, [id, groupName, price, description]).rows[0];
+    `, [id, groupName, price, description]);
 };
 
 export const getAllGroups = async () => {
-    return await db.query('SELECT * FROM groups').rows;
+    const res = await db.query('SELECT * FROM groups');
+    return res.rows;
 };
 
 export const getGroupById = async (groupId) => {
-    return await db.query('SELECT * FROM groups WHERE id = $1', [groupId]).rows[0];
+    const res = await db.query('SELECT * FROM groups WHERE id = $1', [groupId]);
+    return res.rows[0];
 };
 
 export const updateGroup = async (groupId, groupName, price, description) => {
-    return await db.query(`
+    const res = await db.query(`
         UPDATE groups SET group_name = $1, price = $2, description = $3 WHERE id = $4
         RETURNING id, group_name, price, description, created_at;
-    `, [groupName, price, description, groupId]).rows[0];
+    `, [groupName, price, description, groupId]);
+    return res.rows[0];
 };
 
 export const deleteGroup = async (groupId) => {
-    return await db.query('DELETE FROM groups WHERE id = $1 RETURNING id', [groupId]).rows[0];
+    const res = await db.query('DELETE FROM groups WHERE id = $1 RETURNING id', [groupId]);
+    return res.rows[0];
 };
 
 // 3. **Subscriptions CRUD**
@@ -84,5 +91,6 @@ export const getSubscriptionByUserId = async (userId) => {
 };
 
 export const getSubscriptionByGroupId = async (groupId) => {
-    return await db.query('SELECT * FROM subscriptions WHERE group_id = $1', [groupId]).rows;
+    const res = await db.query('SELECT * FROM subscriptions WHERE group_id = $1', [groupId]);
+    return res.rows;
 };

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import readline from 'readline';
 import { groupMap, check } from '../globalVar.js';
-
+import { getSubscriptionByGroupId, addGroup } from '../database/controller.js';
 
 export const rl = readline.createInterface({
     input: process.stdin,
@@ -46,11 +46,6 @@ export function eventMessage(client) {
             if (update.className == "UpdateNewChannelMessage") {
                 const message = update.message; // Xabar matni
 
-                check.forEach((word) => {
-                    if (message.message.toLowerCase().includes(word)) {
-                        console.log(`✅ "${word}" so‘zi topildi!`);
-                    }
-                });
                 console.log("------------------------ UpdateNewChannelMessage ------------------------");
                 console.log(`📩 Yangi xabar keldi!`);
                 console.log(`💬 Xabar: ${message.message}`);
@@ -58,6 +53,19 @@ export function eventMessage(client) {
                 const chat = await client.getEntity(message.peerId?.channelId); // Kanal haqida ma'lumot
                 console.log(`📢 Kanal Nomi: ${chat.title}`)
                 console.log(`📢 Kanal Username: https://t.me/${chat?.username}`);
+
+                if (groupMap.has(message.peerId?.channelId.value)) { // guruh bor
+                    for (const word of check) {
+                        if (message.message.toLowerCase().includes(word)) { // xabar matnida so‘z bormi?
+                            const subscription = await getSubscriptionByGroupId(message.peerId?.channelId.value);
+                            if (subscription.length > 0) {
+                                console.log(`Subscription: ${subscription}`); // guruhga obuna bo‘lganlar
+                            }
+                            break;
+                        }
+                    }
+                } else addGroup(message.peerId?.channelId.value, chat.title, 10000, "Kanal haqida ma'lumot yo‘q");
+                // TODO Guruhni bazaga saqlash va userlarni boshqarish qoldi kelgan habar aniqlandi 😉️️️️️️
             }
         } catch (err) {
             console.log(`❌ Xatolik: ${err.message}`);
