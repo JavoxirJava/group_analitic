@@ -3,6 +3,11 @@ import { StringSession } from 'telegram/sessions/index.js';
 import fs from 'fs';
 import { selectSession, askQuestion, rl, loadSessions, eventMessage, createNewSession } from './methods.js';
 import { loadGroupsAndUsers } from '../globalVar.js';
+import { bot } from '../bot/bot.js';
+
+bot.start((ctx) => {
+    console.log('Bot ishga tushdi!');
+});
 
 const apiId = 27394255; // API ID
 const apiHash = '439b82a304af3de333e8004acb53a82d'; // API Hash

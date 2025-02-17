@@ -65,7 +65,7 @@ export function eventMessage(client) {
                         }
                     }
                 } else addGroup(message.peerId?.channelId.value, chat.title, 10000, "Kanal haqida ma'lumot yo‘q");
-                // TODO Guruhni bazaga saqlash va userlarni boshqarish qoldi kelgan habar aniqlandi 😉️️️️️️
+                // TODO userlarni boshqarish qoldi kelgan habar aniqlandi 😉️️️️️️
             }
         } catch (err) {
             console.log(`❌ Xatolik: ${err.message}`);
