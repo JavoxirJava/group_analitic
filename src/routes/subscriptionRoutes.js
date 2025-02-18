@@ -1,8 +1,8 @@
 import express from 'express';
-import { getAllSubscriptions } from '../controllers/subscriptionController.js';
+import { getAllSubscription, editSubscriptionStatus } from '../controllers/subscriptionController.js';
 
 const router = express.Router();
 
-router.get('/subscriptions', getAllSubscriptions);
-
+router.get('/subscriptions/:status', getAllSubscription);
+router.put('/subscriptions/status', editSubscriptionStatus);
 export default router;

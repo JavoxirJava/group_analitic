@@ -62,14 +62,22 @@ export const addSubscription = async (userId, groupId, durationMonths) => {
         INSERT INTO subscriptions (user_id, group_id, duration_months)
         VALUES ($1, $2, $3)
         RETURNING id, user_id, group_id, duration_months, start_date, end_date, payment_completed;
-    `, [userId, groupId, durationMonths]).rows[0];
+    `, [userId, groupId, durationMonths]).rows;
 };
 
-export const deleteSubscription = async (subscriptionId) => {
+export const editStatus = async (id, status) => {
+    const res = await db.query(`
+        UPDATE subscriptions SET payment_completed = $1 WHERE id = $2
+        RETURNING id, user_id, group_id, duration_months, start_date, end_date, payment_completed;
+    `, [status, id]);
+    return res.rows[0];
+};
+
+export const deleteSubscription = async (id) => {
     return await db.query(`
         DELETE FROM subscriptions WHERE id = $1
         RETURNING id, user_id, group_id, duration_months, start_date, end_date, payment_completed;
-    `, [subscriptionId]).rows[0];
+    `, [id]).rows[0];
 };
 
 export const getAllSubscriptionsFull = async () => {
@@ -82,8 +90,9 @@ export const getAllSubscriptionsFull = async () => {
     `).rows;
 };
 
-export const getAllSubscriptions = async () => {
-    return await db.query('SELECT * FROM subscriptions').rows;
+export const getAllSubscriptions = async (status) => {
+    const res = await db.query('SELECT * FROM subscriptions WHERE payment_completed = $1', [status]);
+    return res.rows;
 };
 
 export const getSubscriptionByUserId = async (userId) => {
