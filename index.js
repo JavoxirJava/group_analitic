@@ -19,10 +19,10 @@ app.listen(PORT, () => {
     console.log(chalk.blue(`🕹 => Server ishga tushdi: http://localhost:${PORT}`));
 }); // 
 
-await loadGroupsAndUsers(); // groupMap va userMap ni yuklash
 try {
-    startBot(); // botni ishga tushirish
-    telegramStart(); // telegramni ishga tushirish
+    await loadGroupsAndUsers(); // groupMap va userMap ni yuklash
+    await startBot(); // botni ishga tushirish
+    await telegramStart(); // telegramni ishga tushirish
 } catch (error) {
     console.error(chalk.red("Xatolik:", error));
 }
