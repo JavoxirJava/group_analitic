@@ -3,6 +3,10 @@ import { startBot } from './src/bot/bot.js'
 import { loadGroupsAndUsers } from './src/globalVar.js';
 import { telegramStart } from './src/telegram/index.js';
 import chalk from "chalk";
+import env from 'dotenv';
+
+env.config();
+
 // import db from './src/database/db.js';
 // import { createTables } from './src/database/tables.js';
 
@@ -16,5 +20,9 @@ app.listen(PORT, () => {
 }); // 
 
 await loadGroupsAndUsers(); // groupMap va userMap ni yuklash
-startBot(); // botni ishga tushirish
-telegramStart(); // telegramni ishga tushirish
+try {
+    startBot(); // botni ishga tushirish
+    telegramStart(); // telegramni ishga tushirish
+} catch (error) {
+    console.error(chalk.red("Xatolik:", error));
+}

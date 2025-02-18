@@ -3,9 +3,12 @@ import { userMap, groups } from '../globalVar.js';
 import { getInlineButton, getSelectButton, userSum } from './botMethods.js';
 import { addSubscription, addUser } from '../database/controller.js';
 import chalk from "chalk";
+import env from 'dotenv';
+
+env.config();
 
 // username: @full_testbot
-export const bot = new Telegraf('7383627105:AAFrktVAWW7g6tIiNwxd8pi8xsGLMPR_8ZQ');
+export const bot = new Telegraf(process.env.BOT_TOKEN);
 
 const buttonSet = new Set();
 let userGroup = new Map();
