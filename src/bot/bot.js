@@ -17,7 +17,7 @@ export const startBot = async () => {
         groups.forEach(group => buttonSet.add(group.id));
         ctx.reply(
             "Assalomu alaykum! Botga xush kelibsiz. Iltimos, kerakli guruhlarni tanlang.",
-            getInlineButton(userGroup.get(ctx.from.id))
+            getInlineButton(userGroup.get(ctx.from.id)) // TODO tugmani chiqarishda userda bor guruhlarni chiqarmaslik kerak!!!
         );
         if (!userMap.has(BigInt(ctx.from.id)))
             addUser(ctx.from.id, ctx.from.username, ctx.from.first_name);
@@ -32,9 +32,13 @@ export const startBot = async () => {
                 }
                 choose.delete(ctx.from.id);
                 ctx.reply(`Siz: "${ctx.message.text}" oy ni tanladingiz. jami summa ${userSum(userGroup, ctx.from.id) * +ctx.message.text} so'm\n\nso'rovingiz adminga yuborildi kurib  chiqib aloqaga chiqamiz!😊`);
-                userGroup.forEach(async groups => {
-                    await addSubscription(BigInt(ctx.from.id), groups.id, +ctx.message.text)
-                });
+                try {
+                    userGroup.get(ctx.from.id).forEach(async group => {
+                        await addSubscription(BigInt(ctx.from.id), BigInt(group.id), +ctx.message.text)
+                    });
+                } catch (error) {
+                    console.error(chalk.red("Error", error?.response?.description || error));
+                }
             }
         }
     });
