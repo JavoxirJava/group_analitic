@@ -47,6 +47,19 @@ export const getAllGroups = async () => {
     return res.rows;
 };
 
+export const getGroupsByNotSubscribed = async (userId) => {
+    const res = await db.query(`
+        SELECT g.*
+        FROM groups g
+        LEFT JOIN subscriptions s 
+            ON g.id = s.group_id 
+            AND s.user_id = $1 
+            AND s.payment_completed = TRUE
+        WHERE s.group_id IS NULL;
+    `, [userId]);
+    return res.rows;
+}
+
 export const getGroupById = async (groupId) => {
     const res = await db.query('SELECT * FROM groups WHERE id = $1', [groupId]);
     return res.rows[0];
@@ -91,13 +104,14 @@ export const deleteSubscription = async (id) => {
 };
 
 export const getAllSubscriptionsFull = async () => {
-    return await db.query(`
+    const res = await db.query(`
         SELECT s.id, s.user_id, s.group_id, s.duration_months, s.start_date, s.end_date, s.payment_completed,
         u.username, u.full_name, g.group_name, g.price, g.description
         FROM subscriptions s
         INNER JOIN users u ON s.user_id = u.id
         INNER JOIN groups g ON s.group_id = g.id;
-    `).rows;
+    `);
+    return res.rows;
 };
 
 export const getAllSubscriptions = async (status) => {

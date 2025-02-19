@@ -51,6 +51,9 @@ export const createTables = async (client) => {
             ON subscriptions (user_id, payment_completed);
 
             CREATE INDEX idx_subscriptions_payment ON subscriptions (payment_completed);
+
+            CREATE INDEX idx_subscriptions_user_group 
+            ON subscriptions (user_id, payment_completed, group_id);
         `);
         console.log("✅ Barcha jadvallar yaratildi.");
     } catch (err) {

@@ -1,7 +1,7 @@
 import { Telegraf } from 'telegraf';
 import { userMap, groups } from '../globalVar.js';
 import { getInlineButton, getSelectButton, userSum } from './botMethods.js';
-import { addSubscription, addUser, editStatus } from '../database/controller.js';
+import { addSubscription, addUser, editStatus, getGroupsByNotSubscribed } from '../database/controller.js';
 import chalk from "chalk";
 import env from 'dotenv';
 
@@ -15,12 +15,13 @@ let userGroup = new Map();
 let choose = new Map();
 
 export const startBot = async () => {
-    bot.start((ctx) => {
-        userGroup.set(ctx.from.id, groups);
+    bot.start(async (ctx) => {
+        const ggbns = await getGroupsByNotSubscribed(ctx.from.id).then(res => res);
+        userGroup.set(ctx.from.id, ggbns);
         groups.forEach(group => buttonSet.add(group.id));
         ctx.reply(
             "Assalomu alaykum! Botga xush kelibsiz. Iltimos, kerakli guruhlarni tanlang.",
-            getInlineButton(userGroup.get(ctx.from.id)) // TODO tugmani chiqarishda userda bor guruhlarni chiqarmaslik kerak!!!
+            getInlineButton(userGroup.get(ctx.from.id))
         );
         if (!userMap.has(BigInt(ctx.from.id))) {
             const saveUser = addUser(ctx.from.id, ctx.from.username, ctx.from.first_name);
@@ -41,8 +42,9 @@ export const startBot = async () => {
                 sendMSG("1085241246", `New subscription ${userSum(userGroup, ctx.from.id) * month}`)
                 try {
                     userGroup.get(ctx.from.id).forEach(async group => {
+                        if (!group.isSelect) return;
                         const saveSubscription = await addSubscription(BigInt(ctx.from.id), BigInt(group.id), month)
-                        await editStatus(saveSubscription.id, true);
+                        await editStatus(saveSubscription.id, true); // TODO vaqtinchalikka statusni true qilganman
                     });
                     userGroup.get(ctx.from.id).forEach(group => group.isSelect = false);
                 } catch (error) {

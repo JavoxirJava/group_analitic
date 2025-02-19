@@ -7,12 +7,12 @@ import env from 'dotenv';
 
 env.config();
 
-// import db from './src/database/db.js';
-// import { createTables } from './src/database/tables.js';
+import db from './src/database/db.js';
+import { createTables } from './src/database/tables.js';
 
 
-// await createTables(db);
-// console.log(chalk.green(" tablelar yaratildi!"));
+await createTables(db);
+console.log(chalk.green(" tablelar yaratildi!"));
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
