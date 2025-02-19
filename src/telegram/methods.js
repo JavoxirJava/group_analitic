@@ -1,9 +1,11 @@
 import fs from 'fs';
 import readline from 'readline';
-import { groupMap, check } from '../globalVar.js';
+import { groupMap, check, groups } from '../globalVar.js';
 import { getSubscriptionByGroupId, addGroup } from '../database/controller.js';
 import chalk from 'chalk';
 import { sendMSG } from '../bot/bot.js';
+
+const groupPending = new Set();
 
 export const rl = readline.createInterface({
     input: process.stdin,
@@ -38,36 +40,17 @@ export async function selectSession(sessions) {
 export function eventMessage(client) {
     client.addEventHandler(async (update) => {
         try {
-            if (update.message?.action && update.message.action.className === 'MessageActionChatAddUser') {
-                const addedUsers = update.message.action.users.map(u => u.value);
-                if (addedUsers.includes(client.session.userId)) {
-                    console.log(chalk.green("Siz yangi guruhga qo‘shildingiz!"));
-                }
-            }
-
             if (update.className == "UpdateNewChannelMessage") {
                 const message = update.message;
 
                 console.log(chalk.green("------------------------ UpdateNewChannelMessage ------------------------"));
-                console.log(chalk.blue(`📩 Yangi xabar keldi!`));
-                console.log(chalk.blue(`💬 Xabar: ${message.message}`));
+                const chat = await client.getEntity(Number("-100" + message.peerId?.channelId));
                 console.log(chalk.blue(`📢 Kanal: ${message.peerId?.channelId}`));
-                const chat = await client.getEntity(Number(message.peerId?.channelId));
                 console.log(chalk.blue(`📢 Kanal Nomi: ${chat.title}`));
                 console.log(chalk.blue(`📢 Kanal Username: https://t.me/${chat?.username}`));
+                console.log(chalk.blue(`💬 Xabar: ${message.message}`));
 
-                if (groupMap.has(message.peerId?.channelId.value)) {
-                    for (const word of check) {
-                        if (message.message.toLowerCase().includes(word)) {
-                            const subscription = await getSubscriptionByGroupId(message.peerId?.channelId.value);
-                            console.log(chalk.yellow(subscription));
-                            if (subscription.length > 0)
-                                subscription.forEach(sub =>
-                                    sendMSG(sub.user_id, `📢 Kanal: ${chat.title}\n📩 Xabar: ${message.message}`));
-                            break;
-                        }
-                    }
-                } else addGroup(message.peerId?.channelId.value, chat.title, 10000, "Kanal haqida ma'lumot yo‘q");
+                await processMessage(message, chat);
             }
         } catch (err) {
             console.log(chalk.red(`❌ Xatolik: ${err.message}`));
@@ -84,4 +67,21 @@ export async function createNewSession(client) {
     const newSessionFile = `${sessionsFolder}/${me.id}.json`;
     fs.writeFileSync(newSessionFile, JSON.stringify(sessionData, null, 2), 'utf-8');
     console.log(chalk.green(`Sessiya saqlandi: ${newSessionFile}`));
+}
+
+export async function processMessage(message, chat) {
+    const chatId = message.peerId?.channelId.value;
+    if (groupMap.has(chatId)) {
+        for (const word of check) if (message.message.toLowerCase().includes(word)) {
+            const subscription = await getSubscriptionByGroupId(chatId);
+            if (subscription.length > 0)
+                subscription.forEach(sub =>
+                    sendMSG(sub.user_id, `📢 Kanal: ${chat.title}\n📩 Xabar: ${message.message}`));
+            break;
+        }
+    } else {
+        const saveGroup = await addGroup(chatId, chat.title, 10000, "Kanal haqida ma'lumot yo‘q");
+        groupMap.set(BigInt(saveGroup.id), saveGroup);
+        groups.push(saveGroup);
+    }
 }

@@ -57,7 +57,7 @@ export const telegramStart = async () => {
         rl.close();
     }
     // while (true) {
-    //     await client.sendMessage("-1002202404819", { message: "💀☠️" });
+    //     await client.sendMessage("-100", { message: "💀☠️" });
     // }
 
     setInterval(async () => {

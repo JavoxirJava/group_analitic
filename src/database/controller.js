@@ -2,11 +2,12 @@ import db from './db.js';
 
 // 1. **Users CRUD**
 export const addUser = async (id, username, fullName) => {
-    return await db.query(`
+    const result = await db.query(`
         INSERT INTO users (id, username, full_name)
         VALUES ($1, $2, $3)
         RETURNING id, username, full_name, registration_date;
         `, [id, username, fullName]);
+    return result.rows[0];
 };
 
 export const getAllUsers = async () => {
@@ -26,16 +27,19 @@ export const deleteUser = async (userId) => {
 
 // 2. **Groups CRUD**
 export const addGroup = async (id, groupName, price, description) => {
-    try {
-        const res = await db.query(`
-            INSERT INTO groups (id, group_name, price, description)
-            VALUES ($1, $2, $3, $4)
-            RETURNING id, group_name, price, description, created_at;
-        `, [id, groupName, price, description]);
-        return res.rows[0];
-    } catch (error) {
-        console.error(chalk.red("Error", error?.response?.description || error));
-    }
+    const result = await db.query(
+        `INSERT INTO groups (id, group_name, price, description)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (id) DO NOTHING
+         RETURNING id, group_name, price, description, created_at`,
+        [id, groupName, price, description]
+    );
+    if (result.rows.length > 0) return result.rows[0];
+    const existingGroup = await db.query(
+        "SELECT id, group_name, price, description, created_at FROM groups WHERE id = $1",
+        [id]
+    );
+    return existingGroup.rows[0];
 };
 
 export const getAllGroups = async () => {
@@ -63,11 +67,12 @@ export const deleteGroup = async (groupId) => {
 
 // 3. **Subscriptions CRUD**
 export const addSubscription = async (userId, groupId, durationMonths) => {
-    return await db.query(`
+    const res = await db.query(`
         INSERT INTO subscriptions (user_id, group_id, duration_months)
         VALUES ($1, $2, $3)
         RETURNING id, user_id, group_id, duration_months, start_date, end_date, payment_completed;
-    `, [userId, groupId, durationMonths]).rows;
+    `, [userId, groupId, durationMonths]);
+    return res.rows[0];
 };
 
 export const editStatus = async (id, status) => {
