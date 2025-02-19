@@ -69,6 +69,10 @@ export const startBot = async () => {
     });
 }
 
+export function sendMSG(chatId, text) {
+    bot.telegram.sendMessage(chatId, text);
+}
+
 
 bot.launch();
 console.log(chalk.blue("🤖 => Telegram bot ishga tushdi "));

@@ -3,6 +3,7 @@ import readline from 'readline';
 import { groupMap, check } from '../globalVar.js';
 import { getSubscriptionByGroupId, addGroup } from '../database/controller.js';
 import chalk from 'chalk';
+import { sendMSG } from '../bot/bot.js';
 
 export const rl = readline.createInterface({
     input: process.stdin,
@@ -13,7 +14,7 @@ export const loadSessions = () => {
     if (!fs.existsSync(sessionsFolder)) fs.mkdirSync(sessionsFolder);
     return fs.readdirSync(sessionsFolder).filter((file) => file.endsWith('.json'));
 };
-const sessionsFolder = './sessions'; // Sessiya fayllarini saqlash uchun papka
+const sessionsFolder = './sessions';
 
 export const askQuestion = (query) => new Promise((resolve) => rl.question(query, resolve));
 
@@ -45,28 +46,28 @@ export function eventMessage(client) {
             }
 
             if (update.className == "UpdateNewChannelMessage") {
-                const message = update.message; // Xabar matni
+                const message = update.message;
 
                 console.log(chalk.green("------------------------ UpdateNewChannelMessage ------------------------"));
                 console.log(chalk.blue(`📩 Yangi xabar keldi!`));
                 console.log(chalk.blue(`💬 Xabar: ${message.message}`));
                 console.log(chalk.blue(`📢 Kanal: ${message.peerId?.channelId}`));
-                const chat = await client.getEntity(message.peerId?.channelId); // Kanal haqida ma'lumot
+                const chat = await client.getEntity(Number(message.peerId?.channelId));
                 console.log(chalk.blue(`📢 Kanal Nomi: ${chat.title}`));
                 console.log(chalk.blue(`📢 Kanal Username: https://t.me/${chat?.username}`));
 
-                if (groupMap.has(message.peerId?.channelId.value)) { // guruh bor
+                if (groupMap.has(message.peerId?.channelId.value)) {
                     for (const word of check) {
-                        if (message.message.toLowerCase().includes(word)) { // xabar matnida so‘z bormi?
+                        if (message.message.toLowerCase().includes(word)) {
                             const subscription = await getSubscriptionByGroupId(message.peerId?.channelId.value);
-                            if (subscription.length > 0) {
-                                console.log(chalk.blue(`Subscription: ${subscription}`)); // guruhga obuna bo‘lganlar
-                            }
+                            console.log(chalk.yellow(subscription));
+                            if (subscription.length > 0)
+                                subscription.forEach(sub =>
+                                    sendMSG(sub.user_id, `📢 Kanal: ${chat.title}\n📩 Xabar: ${message.message}`));
                             break;
                         }
                     }
                 } else addGroup(message.peerId?.channelId.value, chat.title, 10000, "Kanal haqida ma'lumot yo‘q");
-                // TODO userlarni boshqarish qoldi kelgan habar aniqlandi 😉️️️️️️
             }
         } catch (err) {
             console.log(chalk.red(`❌ Xatolik: ${err.message}`));

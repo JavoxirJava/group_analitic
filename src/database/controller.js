@@ -26,11 +26,16 @@ export const deleteUser = async (userId) => {
 
 // 2. **Groups CRUD**
 export const addGroup = async (id, groupName, price, description) => {
-    return await db.query(`
-        INSERT INTO groups (id, group_name, price, description)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id, group_name, price, description, created_at;
-    `, [id, groupName, price, description]);
+    try {
+        const res = await db.query(`
+            INSERT INTO groups (id, group_name, price, description)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id, group_name, price, description, created_at;
+        `, [id, groupName, price, description]);
+        return res.rows[0];
+    } catch (error) {
+        console.error(chalk.red("Error", error?.response?.description || error));
+    }
 };
 
 export const getAllGroups = async () => {
@@ -96,10 +101,11 @@ export const getAllSubscriptions = async (status) => {
 };
 
 export const getSubscriptionByUserId = async (userId) => {
-    return await db.query('SELECT * FROM subscriptions WHERE user_id = $1', [userId]).rows;
+    const res = await db.query('SELECT * FROM subscriptions WHERE user_id = $1 and payment_completed = true', [userId]);
+    return res.rows;
 };
 
 export const getSubscriptionByGroupId = async (groupId) => {
-    const res = await db.query('SELECT * FROM subscriptions WHERE group_id = $1', [groupId]);
+    const res = await db.query('SELECT * FROM subscriptions WHERE group_id = $1 and payment_completed = true', [groupId]);
     return res.rows;
 };

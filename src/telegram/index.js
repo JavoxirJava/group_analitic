@@ -48,14 +48,17 @@ export const telegramStart = async () => {
         }); /// ================ function clouser orqali ishlatib kurish /// ====================================
         rl.close();
 
-        console.log(chalk.green('\nMuvaffaqiyatli ulandingiz!'));
-        console.log(chalk.blue('\nKelgan xabarlarni kuzatish boshlanmoqda...\n'));
+        console.log(chalk.green('Muvaffaqiyatli ulandingiz!'));
+        console.log(chalk.blue('Kelgan xabarlarni kuzatish boshlanmoqda...'));
         eventMessage(client);
         await createNewSession(client);
     } catch (err) {
         console.error(chalk.red('Xatolik yuz berdi:', err));
         rl.close();
     }
+    // while (true) {
+    //     await client.sendMessage("-1002202404819", { message: "💀☠️" });
+    // }
 
     setInterval(async () => {
         try {

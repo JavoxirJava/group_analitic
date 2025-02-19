@@ -42,6 +42,15 @@ export const createTables = async (client) => {
             BEFORE INSERT ON subscriptions
             FOR EACH ROW
             EXECUTE FUNCTION set_end_date();
+
+            -- INDEXING SUBSCRIPTIONS
+            CREATE INDEX idx_subscriptions_group_payment
+            ON subscriptions (group_id, payment_completed);
+
+            CREATE INDEX idx_subscriptions_user_payment
+            ON subscriptions (user_id, payment_completed);
+
+            CREATE INDEX idx_subscriptions_payment ON subscriptions (payment_completed);
         `);
         console.log("✅ Barcha jadvallar yaratildi.");
     } catch (err) {
