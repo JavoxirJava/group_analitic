@@ -1,4 +1,6 @@
 import db from './db.js';
+import { bot } from '../bot/bot.js';
+import chalk from 'chalk';
 
 // 1. **Users CRUD**
 export const addUser = async (id, username, fullName) => {
@@ -128,3 +130,58 @@ export const getSubscriptionByGroupId = async (groupId) => {
     const res = await db.query('SELECT * FROM subscriptions WHERE group_id = $1 and payment_completed = true', [groupId]);
     return res.rows;
 };
+
+export async function checkSubscriptions() {
+    const today = new Date();
+    const threeDaysLater = new Date();
+    threeDaysLater.setDate(today.getDate() + 3); // 3 kun oldinga sanani qo‘shish
+
+    const todayISO = today.toISOString().split("T")[0]; // YYYY-MM-DD format
+    const threeDaysLaterISO = threeDaysLater.toISOString().split("T")[0];
+
+    // 1️⃣ **3 kun ichida tugaydigan obunalarni topamiz va eslatma yuboramiz**
+    const expiringUsers = await db.query(
+        `SELECT user_id, group_id, end_date 
+         FROM subscriptions 
+         WHERE payment_completed = TRUE 
+         AND end_date BETWEEN $1 AND $2`,
+        [todayISO, threeDaysLaterISO]
+    );
+
+    for (const sub of expiringUsers.rows) {
+        const userId = sub.user_id;
+        const endDate = new Date(sub.end_date);
+        const formattedEndDate = `${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`;
+
+        await bot.telegram.sendMessage(
+            userId,
+            `🔔 **Obuna muddati tugashiga oz qoldi!**\n\n📅 Tugash sanasi: *${formattedEndDate}*\n🚕 Xizmat davom etishi uchun obunangizni yangilashni unutmang!`
+        );
+    }
+
+    console.log(chalk.yellow(`✅ ${expiringUsers.rows.length} ta foydalanuvchiga eslatma yuborildi.`));
+
+    // 2️⃣ **Muddati tugagan obunalarni o‘chirib, foydalanuvchilarga xabar yuboramiz**
+    const expiredUsers = await db.query(
+        `SELECT s.user_id, s.group_id, g.group_name
+     FROM subscriptions s
+     JOIN groups g ON s.group_id = g.id
+     WHERE s.payment_completed = TRUE 
+     AND s.end_date < $1`,
+        [todayISO]
+    );
+
+    for (const sub of expiredUsers.rows) {
+        const userId = sub.user_id;
+        const groupName = sub.group_name;
+
+        await editStatus(sub.id, false);
+
+        await bot.telegram.sendMessage(
+            userId,
+            `⚠️ **Sizning "${groupName}" guruhiga bo‘lgan obunangiz muddati tugadi!**\n🚕 Xizmatdan foydalanishni davom ettirish uchun obunani yangilang!`
+        );
+    }
+
+    console.log(chalk.red(`❌ ${expiredUsers.rows.length} ta foydalanuvchining obunasi tugadi.`));
+}

@@ -1,9 +1,10 @@
 import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions/index.js';
 import fs from 'fs';
-import { selectSession, askQuestion, rl, loadSessions, eventMessage, createNewSession } from './methods.js';
+import { selectSession, askQuestion, rl, loadSessions, eventMessage, createNewSession, onlineAccaunt } from './methods.js';
 import chalk from "chalk";
 import env from 'dotenv';
+import { oneDay } from '../globalVar.js';
 
 env.config();
 
@@ -60,13 +61,8 @@ export const telegramStart = async () => {
     //     await client.sendMessage("-100", { message: "💀☠️" });
     // }
 
+    onlineAccaunt(client);
     setInterval(async () => {
-        try {
-            const message = await client.sendMessage("me", { message: "🚀 Online bo‘lish uchun harakat" });
-            await client.deleteMessages("me", [message.id], { revoke: true });
-            console.log(chalk.blue("✍️ Aktivlik qo‘shildi va xabar o‘chirildi"));
-        } catch (err) {
-            console.error(chalk.red("❌ Aktivlik xatosi:", err));
-        }
-    }, 24 * 60 * 60 * 1000); // ** 1 kun ** //
+        onlineAccaunt(client);
+    }, oneDay);
 };  
