@@ -3,11 +3,17 @@ import { getAllSubscriptions, editStatus } from '../database/controller.js';
 export const getAllSubscription = async (req, res) => {
     try {
         const { status } = req.params;
-        res.json(await getAllSubscriptions(status));
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        const data = await getAllSubscriptions(status, page, limit);
+
+        res.json(data);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
+
 
 export const editSubscriptionStatus = async (req, res) => {
     try {

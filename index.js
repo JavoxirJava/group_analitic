@@ -5,7 +5,7 @@ import { telegramStart } from './src/telegram/index.js';
 import chalk from "chalk";
 import env from 'dotenv';
 import { checkSubscriptions } from './src/database/controller.js';
-env.config();
+env.config(); // TODO get lar uchun pagination qushish kk
 
 // import db from './src/database/db.js';
 // import { createTables } from './src/database/tables.js';
@@ -17,7 +17,7 @@ env.config();
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
     console.log(chalk.blue(`🕹 => Server ishga tushdi: http://localhost:${PORT}`));
-}); // 
+});
 
 try {
     await loadGroupsAndUsers(); // groupMap va userMap ni yuklash

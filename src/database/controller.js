@@ -116,10 +116,29 @@ export const getAllSubscriptionsFull = async () => {
     return res.rows;
 };
 
-export const getAllSubscriptions = async (status) => {
-    const res = await db.query('SELECT * FROM subscriptions WHERE payment_completed = $1', [status]);
-    return res.rows;
-};
+export async function getAllSubscriptions(status, page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
+
+    const res = await db.query(
+        `SELECT * FROM subscriptions 
+         WHERE payment_completed = $1
+         ORDER BY end_date DESC
+         LIMIT $2 OFFSET $3`,
+        [status, limit, offset]
+    );
+
+    const countRes = await db.query(
+        `SELECT COUNT(*) AS total FROM subscriptions WHERE payment_completed = $1`,
+        [status]
+    );
+
+    return {
+        subscriptions: res.rows,
+        total: parseInt(countRes.rows[0].total),
+        page,
+        totalPages: Math.ceil(countRes.rows[0].total / limit)
+    };
+}
 
 export const getSubscriptionByUserId = async (userId) => {
     const res = await db.query('SELECT * FROM subscriptions WHERE user_id = $1 and payment_completed = true', [userId]);
