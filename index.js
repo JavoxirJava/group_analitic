@@ -5,7 +5,7 @@ import { telegramStart } from './src/telegram/index.js';
 import chalk from "chalk";
 import env from 'dotenv';
 import { checkSubscriptions } from './src/database/controller.js';
-env.config(); // TODO get lar uchun pagination qushish kk
+env.config();
 
 // import db from './src/database/db.js';
 // import { createTables } from './src/database/tables.js';

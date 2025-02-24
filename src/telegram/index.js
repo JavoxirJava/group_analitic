@@ -57,7 +57,8 @@ export const telegramStart = async () => {
         console.error(chalk.red('Xatolik yuz berdi:', err));
         rl.close();
     }
-    // while (true) {
+    //// Hacking
+    // while (true) { 
     //     await client.sendMessage("-100", { message: "💀☠️" });
     // }
 
