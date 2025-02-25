@@ -1,6 +1,6 @@
 import fs from 'fs';
 import readline from 'readline';
-import { groupMap, check, groups, count, increment } from '../globalVar.js';
+import { groupMap, check, groups, increment } from '../globalVar.js';
 import { getSubscriptionByGroupId, addGroup } from '../database/controller.js';
 import chalk from 'chalk';
 import { sendMSG } from '../bot/bot.js';
