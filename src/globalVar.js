@@ -1,5 +1,6 @@
 import { getAllGroups, getAllUsers } from './database/controller.js';
 
+export const ADMIN_ID = 1085241246;
 export let groups = [];
 export let groupMap = new Map();
 export let userMap = new Map();

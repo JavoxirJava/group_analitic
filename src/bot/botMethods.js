@@ -28,3 +28,39 @@ export function userSum(userGroup, userId) {
     }, 0);
     return sum;
 }
+
+export async function startCommand(ctx, userGroup, userMap, buttonSet, addUser, getGroupsByNotSubscribed, groups, choose) {
+    const ggbns = await getGroupsByNotSubscribed(ctx.from.id).then(res => res);
+    userGroup.set(ctx.from.id, ggbns);
+    groups.forEach(group => buttonSet.add(group.id));
+    ctx.reply(
+        "Assalomu alaykum! Botga xush kelibsiz. Iltimos, kerakli guruhlarni tanlang.",
+        getInlineButton(userGroup.get(ctx.from.id))
+    );
+    if (!userMap.has(BigInt(ctx.from.id))) {
+        const saveUser = addUser(ctx.from.id, ctx.from.username, ctx.from.first_name);
+        userMap.set(BigInt(ctx.from.id), saveUser);
+    }
+    choose.set(ctx.from.id, "selectGroup");
+}
+
+export async function chooseMonth(ctx, choose, userGroup, groupText, sendMSG, addSubscription) {
+    if (isNaN(ctx.message.text) || ctx.message.text < 1) {
+        ctx.reply("Noto'g'ri raqam kiritdingiz. Iltimos, qaytadan urinib ko'ring.");
+        return;
+    }
+    const month = parseInt(ctx.message.text, 10)
+    choose.delete(ctx.from.id);
+    const gText = groupText(ctx.from.id);
+    ctx.reply(`Siz: "${month}" oy ni tanladingiz.\nsiz tanlagan Guruhlar:\n${gText}\njami summa ${userSum(userGroup, ctx.from.id) * month} so'm\n\nso'rovingiz adminga yuborildi kurib  chiqib aloqaga chiqamiz!😊`);
+    sendMSG("1085241246", `New subscription: \nUser: ${ctx.from.first_name}\nGroups: \n${gText}\nMonth: ${month}\nAllPrice: ${userSum(userGroup, ctx.from.id) * month} so'm`)
+    try {
+        userGroup.get(ctx.from.id).forEach(async group => {
+            if (!group.isSelect) return;
+            await addSubscription(BigInt(ctx.from.id), BigInt(group.id), month)
+        });
+        userGroup.get(ctx.from.id).forEach(group => group.isSelect = false);
+    } catch (error) {
+        console.error(chalk.red("Error", error?.response?.description || error));
+    }
+}
