@@ -1,6 +1,6 @@
 import fs from 'fs';
 import readline from 'readline';
-import { groupMap, check, groups } from '../globalVar.js';
+import { groupMap, check, groups, count, increment } from '../globalVar.js';
 import { getSubscriptionByGroupId, addGroup } from '../database/controller.js';
 import chalk from 'chalk';
 import { sendMSG } from '../bot/bot.js';
@@ -36,12 +36,11 @@ export async function selectSession(sessions) {
 };
 
 export function eventMessage(client) {
-    client.addEventHandler(async (update) => {
+    client.addEventHandler(async update => {
         try {
             if (update.className == "UpdateNewChannelMessage") {
                 const message = update.message;
-
-                console.log(chalk.green("------------------------ UpdateNewChannelMessage ------------------------"));
+                console.log(chalk.green((increment()) + "------------------------ UpdateNewChannelMessage ------------------------"));
 
                 const chat = await client.getEntity(Number("-100" + message.peerId?.channelId));
                 console.log(chalk.blue(`📢 Channel: ${message.peerId?.channelId}`));

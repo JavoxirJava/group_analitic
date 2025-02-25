@@ -6,6 +6,8 @@ export let groupMap = new Map();
 export let userMap = new Map();
 export const check = ["taksi kerak", "odam bor", "pochta bor"];
 export const oneDay = 24 * 60 * 60 * 1000;
+let taskCount = 1;
+export const increment = () => taskCount++;
 
 export const loadGroupsAndUsers = async () => {
     groups = await getAllGroups();

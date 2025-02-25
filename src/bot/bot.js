@@ -25,6 +25,7 @@ export const startBot = async () => {
             ctx.reply("O'chirish uchun guruhni tanlang", getInlineButton(userGroup.get(ctx.from.id)));
         }
     });
+
     bot.help(ctx => ctx.reply("Text...!"));
 
     bot.on('message', ctx => {
