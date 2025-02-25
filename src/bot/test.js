@@ -3,7 +3,7 @@ fetch("http://167.172.68.187:5001/api/subscriptions/status", {
     headers: {
         "Content-Type": "application/json",
     },
-    body: JSON.stringify({ id: 6, status: "true" }),
-}).then((res) => res.json())
+    body: JSON.stringify({ id: 6, status: true }),
+}).then(res => res.json())
     .then(console.log)
     .catch(console.error);
